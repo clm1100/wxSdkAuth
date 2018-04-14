@@ -21,6 +21,7 @@ var FEurl = client.getAuthorizeURL('http://qq.nodejsvue.cn/auth.html', '测试�
 router.get('/auth', function (req, res) {
     res.redirect(url)
 });
+
 router.get('/feauth', function (req, res) {
     res.redirect(FEurl)
 });
