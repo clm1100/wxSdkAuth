@@ -9,9 +9,8 @@ var fs = require('fs');
 var path = require('path')
 var config = require('../config')()
 var tokenPath = path.join(__dirname,'../tmp/token.json');
-var ticketPath = path.join(__dirname,'')
+var ticketPath = path.join(__dirname,'../tmp/ticket.json')
 
-console.log(tokenPath);
 
 
 function getNewToken(config, cb) {
@@ -72,17 +71,36 @@ function getNewTicket(token, cb) {
 }
 
 
-function getTicket(config, cb){
-    readFile(ticketPath,function(result){ })
+function getTicket(config, cb) {
+    readFile(ticketPath, function (result) {
+        if ((JSON.parse(result || "{}").time || 0) + 7000000 < (+new Date())) {
+            console.log("111111111")
+            getToken(config, function (err, token) {
+                getNewTicket(token, function(err,data){
+                    let obj = {}
+                    obj.ticket = data;
+                    obj.time = new Date().getTime();
+                    // 文件保存
+                    writeFile(ticketPath, JSON.stringify(obj));
+                    cb(null,data)
+                }) 
+            })
+        } else {
+            console.log("未过期从缓存中获取")
+            cb(null, result)
+        }
+    })
 }
 
 
 
 
-getToken(config,function(err,data){
+// getToken(config,function(err,data){
+//     console.log(data)
+// })
+getTicket(config,function(err,data){
     console.log(data)
 })
-
 
 
 
