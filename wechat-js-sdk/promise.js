@@ -66,10 +66,7 @@ function getNewToken(config, cb) {
 
 function getToken(){
   return  new Promise(function(resolve,reject){
-    readFile(tokenPath).then(function(result){
-        console.log((JSON.parse(result||"{}").time||0)+7000000)
-        console.log(+new Date())
-        
+    readFile(tokenPath).then(function(result){      
         if((JSON.parse(result||"{}").time||0)+7000000<(+new Date())){
             getNewToken(config).then(function(data){
                 let obj = {}
@@ -80,13 +77,55 @@ function getToken(){
                 resolve(data)
             })
         }else{
-            console.log("未过期从缓存中获取")
-            resolve(result)
+            resolve(JSON.parse(result||"").token)
         }
     })
   })
 }
 
-getToken().then((data)=>{
-    console.log(data)
-})
+// getToken().then((data)=>{
+//     console.log(data)
+// })
+
+function getNewTicket(config) {
+    return new Promise((resolve, reject) => {
+        getToken(config).then((token) => {
+            request.get('https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=' + token + '&type=jsapi', function (error, res, body) {
+                if (error) {
+                    reject(error);
+                }
+                else {
+                    try {
+                        var ticket = JSON.parse(body).ticket;
+                        let obj = {}
+                        obj.ticket = ticket;
+                        obj.time = new Date().getTime();
+                        // 文件保存
+                        writeFile(ticketPath, JSON.stringify(obj));
+                        resolve(ticket);
+                    }
+                    catch (e) {
+                        reject(e);
+                    }
+                }
+            });
+        })
+    })
+}
+
+async function  getTicket(){
+    let obj = await readFile(ticketPath)
+    let ticket;
+    if ((JSON.parse(obj || "{}").time || 0) + 7000000 < (+new Date())) {
+        console.log("过期了")
+         ticket = await getNewTicket(config);
+    }else{
+        console.log("未过期")
+        ticket = JSON.parse(obj||"{}").ticket;
+    }
+    // return Promise.resolve(ticket);
+    return ticket
+}
+getTicket().then((data)=>{console.log(data)})
+
+
