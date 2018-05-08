@@ -40,8 +40,22 @@ router.get('/feauth', function (req, res) {
 //       });
 // });
 
+router.get('/redirect',function(req,res){
+    var redirect_url  = req.query.url;
+    console.log(redirect_url)
+    var APPID = "wx75340481908402a8"
+    var getCodeUrl = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${APPID}&redirect_uri=${redirect_url}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect`;
+    res.json({url:getCodeUrl});
+
+    // 这种写法是错误的，ajax返回不能是这种情况
+    // res.redirect(getCodeUrl)
+
+})
+
+
+
 router.get('/code', function (req, res) {
-    let CODE = req.query.code; 
+    let CODE = req.query.code;
     var APPID = "wx75340481908402a8"
     var SECRET = "2b6ee0cbeec0114eb539e68ba356329b"
     var url1 = `https://api.weixin.qq.com/sns/oauth2/access_token?appid=${APPID}&secret=${SECRET}&code=${CODE}&grant_type=authorization_code` 
@@ -51,6 +65,7 @@ router.get('/code', function (req, res) {
         var OPENID = JSON.parse(response.text).openid;
         var url2 = `https://api.weixin.qq.com/sns/userinfo?access_token=${ACCESS_TOKEN}&openid=${OPENID}&lang=zh_CN`;
         superagent.get(url2).end(function(err,response){
+            console.log(response.text)
             res.send(response.text)
         })
     })
