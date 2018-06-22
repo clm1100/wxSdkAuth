@@ -4,7 +4,7 @@ var signature = require('wx_jsapi_sign');
 var config = require('../config')();
 /* GET users listing. */
 
-console.log(signature)
+// console.log(signature)
 
 // 测试更改2
 router.post('/getsignature', function(req, res){
