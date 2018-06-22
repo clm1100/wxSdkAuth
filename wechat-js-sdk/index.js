@@ -33,7 +33,6 @@ function getNewToken(config, cb) {
 }
 
 
-
 function getToken(config, cb) {
     readFile(tokenPath,function(result){ 
         if((JSON.parse(result||"{}").time||0)+7000000<(+new Date())){
@@ -146,3 +145,20 @@ function decodeBuffer(bf, encoding) {
     }
     return val;
 }
+
+router.post('/getsignature', function (req, res) {
+    var url = req.body.url;
+    getTicket(config, function (err, result) {
+        var timestamp = getTimesTamp();
+        var noncestr = getNonceStr();
+        var str = 'jsapi_ticket=' + result.ticket + '&noncestr='+ noncestr+'&timestamp=' + timestamp + '&url=' + url;
+        var signature = crypto.createHash('sha1').update(str).digest('hex');
+        res.json({
+            appId: config.appId,
+            timestamp: timestamp,
+            nonceStr: noncestr,
+            signature: signature
+        });
+    })
+
+});

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <a id="url" href="###"><button id="btn">跳转授权</button></a>
+</head>
+
+<body>
+    <script src="./js/zepto.min.js"></script>
+    <script>
+        $(function () {
+            $.get('/redirect', {
+                url: 'http://qq.nodejsvue.cn/auth.html'
+            }, function (data) {
+                console.log(data)
+                alert(data.url)
+                $("#url").attr({href:data.url})
+            })
+        })
+    </script>
+</body>
+
+</html>
